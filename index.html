@@ -11,48 +11,66 @@
     font-family: Arial, sans-serif;
     text-align: center;
     height: 100%;
-    overflow: hidden; /* 防止因視頻背景滾動影響視覺 */
+    overflow: hidden;
   }
 
-  /* 全屏背景視頻 */
+  /* 背景影片 */
   .background-video {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    object-fit: cover; /* 視頻自動縮放，保持比例並覆蓋全屏 */
-    z-index: -1; /* 讓視頻位於所有內容的後面 */
+    object-fit: cover;
+    z-index: -1;
+  }
+
+  /* 添加透明遮罩 */
+  .overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* 半透明黑色遮罩 */
+    z-index: 0;
   }
 
   h1 {
-    background-color: rgba(98, 0, 234, 0.8); /* 添加透明背景色 */
+    position: relative;
+    z-index: 1;
+    background-color: rgba(98, 0, 234, 0.8);
     color: white;
     padding: 20px 0;
     margin: 0;
   }
 
   .container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 15px;
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px;
     padding: 20px;
+    max-width: 80%;
+    margin: auto;
   }
 
   button {
-    background-color: #6200ea;
-    color: white;
+    background-color: rgba(255, 255, 255, 0.7); /* 半透明白色背景 */
+    color: #6200ea;
     border: none;
-    padding: 10px 20px;
-    font-size: 16px;
+    padding: 10px 15px;
+    font-size: 14px;
     cursor: pointer;
-    border-radius: 5px;
-    transition: background-color 0.3s;
+    border-radius: 10px;
+    transition: background-color 0.3s, transform 0.2s;
+    white-space: nowrap;
   }
 
   button:hover {
-    background-color: #3700b3;
+    background-color: rgba(255, 255, 255, 0.9);
+    transform: scale(1.1);
   }
 </style>
 <script>
@@ -63,33 +81,38 @@
 </head>
 <body>
 
-<!-- 添加背景視頻 -->
+<!-- 背景影片 -->
 <video class="background-video" autoplay muted loop>
   <source src="background.mp4" type="video/mp4">
   您的瀏覽器不支持 HTML5 視頻標籤。
 </video>
 
+<!-- 添加透明遮罩 -->
+<div class="overlay"></div>
+
+<!-- 頁面內容 -->
 <h1>Welcome to My Download Page</h1>
 <div class="container">
+  <!-- 完整按鈕列表 -->
   <button onclick="navigateTo('https://mega.nz/file/oi9FwS4A#KkNE8iZGZ93b9x5vJy6uLiITwzNII8G4hStZlhe71r0')">完全解除安裝</button>
   <button onclick="navigateTo('https://mega.nz/file/YqdyFZyJ#deWApPJiqjKQ90dkYeWGFemUek-fW8p-oyFAnUeEzK0')">Mstsc</button>
   <button onclick="navigateTo('https://mega.nz/file/kzsAwR6L#cX6EzG4j7RYvpEBEQ_-ANPxryHIyACSK1Ur9rNByobc')">YT下載,轉語音</button>
   <button onclick="navigateTo('https://mega.nz/file/5vlHQKrA#z8KBD3GwvhZgKIqaZtrFQenUlNCVjfK4OjbpjhYhPMg')">抓包</button>
-  <button onclick="navigateTo('https://mega.nz/file/sjtiiS7I#XAOWzIJVbNQhBad1CAGdPvCkc9JO-PAVcp4RYWYvS7w')">Windows_系統優化軟件</button>
+  <button onclick="navigateTo('https://mega.nz/file/sjtiiS7I#XAOWzIJVbNQhBad1CAGdPvCkc9JO-PAVcp4RYWYvS7w')">Windows 系統優化軟件</button>
   <button onclick="navigateTo('https://mega.nz/file/9qNQUZbA#8acjTis5xSbliZoLPiM3pJVY6z2rMXnrq8Vw8Sxnuvw')">加密猫</button>
   <button onclick="navigateTo('https://mega.nz/file/UvFX1KrR#ALTTpl4b11sCiNPtWtxrLzIgTqSp0MCThHULFM7zVyc')">Windows金鑰破解</button>
   <button onclick="navigateTo('https://mega.nz/file/UuVQlZCY#dyta77yzfpr1OkeaVWXEoUuf9Koaa2gc-tpBv5JB_jw')">SSH無線傳輸</button>
   <button onclick="navigateTo('https://mega.nz/file/oy8HRKiQ#EmtBeFleVhQynjtJKcuC2wLkkzldkJJLQXSy7Vvf43I')">Java</button>
-  <button onclick="navigateTo('https://mega.nz/file/Vz1HgL4a#BJeXSu90nBn5Tp5wdGpZbAcR5yqtFT6tdS4J9yCFsio')">Python_打包程式</button>
+  <button onclick="navigateTo('https://mega.nz/file/Vz1HgL4a#BJeXSu90nBn5Tp5wdGpZbAcR5yqtFT6tdS4J9yCFsio')">Python 打包程式</button>
   <button onclick="navigateTo('https://mega.nz/file/MikHAR4D#CAK6X_PsVwEVIqr6p-8qoYzmV9hQgulfctg27wCgD70')">壓縮檔密碼破</button>
-  <button onclick="navigateTo('https://mega.nz/file/0uUQzCYQ#_i3smbqReRPZp-TbEr7zSPCbL0tFr8zneqax-K9wwgE')">Ashampoo_WinOptimizer_25</button>
+  <button onclick="navigateTo('https://mega.nz/file/0uUQzCYQ#_i3smbqReRPZp-TbEr7zSPCbL0tFr8zneqax-K9wwgE')">Ashampoo WinOptimizer 25</button>
   <button onclick="navigateTo('https://github.com/amir1376/ab-download-manager/releases/tag/v1.4.4')">超線程下載器</button>
   <button onclick="navigateTo('https://mega.nz/file/M3sR3Z6B#Sg__HArNSzgmislb8dPcU0s1ywU73TLytanGL2XR1z8')">ico圖標製作</button>
   <button onclick="navigateTo('https://mega.nz/file/JvNXjbwZ#UPWFYCDyzIsl41DllnDfTsGVHvO0nTp3o_mieZPOEXA')">原神官方模組包</button>
   <button onclick="navigateTo('https://mega.nz/folder/4i1CHS4K#gaxyjNvG-JEXPOVE4-UG9g')">產生字幕並翻譯</button>
   <button onclick="navigateTo('https://mega.nz/file/1nU0UTJJ#iZSMsAEsHrMUnp8mSn8Zdi9frcj-GYTiME-dipFWXJA')">VScode-html插件</button>
-  <button onclick="navigateTo('https://mega.nz/file/pjVknJaA#YVDlUQuakOana_V1uGdWChK3c1TjKzAudbBAietic1E')">Cloudflare_VPN</button>
-  <button onclick="navigateTo('https://mega.nz/file/tikHzKwK#k97oariFVBOZgR1SP2p_h6nT8tYSH_8cpM7B9niw7gY')">Cpolar-內網穿透</button>
+  <button onclick="navigateTo('https://mega.nz/file/pjVknJaA#YVDlUQuakOana_V1uGdWChK3c1TjKzAudbBAietic1E')">Cloudflare VPN</button>
+  <button onclick="navigateTo('https://mega.nz/file/tikHzKwK#k97oariFVBOZgR1SP2p_h6nT8tYSH_8cpM7B9niw7gY')">Cpolar 內網穿透</button>
   <button onclick="navigateTo('https://mega.nz/file/QmNQxZoS#OtJR1fac4nHHhQ4_1RJc_dylZ7n_noARyno9t3i2RnE')">開源PDF翻譯</button>
   <button onclick="navigateTo('https://mega.nz/file/NmFBHSxS#6d-PclRIwttvhetQnKL0u9B_nmrCqRZQouG9J-hgHY8')">VMW.17.6.2_TW虛擬機</button>
   <button onclick="navigateTo('https://mega.nz/folder/9iU3CSLD#9f6g3EKAZMoep5dxjqpddg')">電腦病毒樣本</button>
