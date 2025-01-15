@@ -14,7 +14,6 @@
       overflow: hidden;
     }
 
-    /* 背景影片 */
     .background-video {
       position: fixed;
       top: 0;
@@ -25,7 +24,6 @@
       z-index: -1;
     }
 
-    /* 左右按鈕容器 */
     .left-buttons, .right-buttons {
       position: fixed;
       top: 50%;
@@ -45,7 +43,6 @@
       right: 10px;
     }
 
-    /* 按鈕樣式 */
     button {
       background-color: rgba(255, 255, 255, 0.7);
       color: #6200ea;
@@ -63,7 +60,6 @@
       transform: scale(1.1);
     }
 
-    /* 音樂開關圖示 */
     .audio-control {
       position: fixed;
       top: 10px;
@@ -83,13 +79,12 @@
       background-color: rgba(255, 255, 255, 1);
     }
 
-    /* 粒子效果 */
     .particle {
       position: absolute;
       pointer-events: none;
       z-index: 1000;
-      opacity: 0; /* 初始透明 */
-      animation: fadeInOut 0.5s forwards; /* 加快淡入淡出动画 */
+      opacity: 0;
+      animation: fadeInOut 0.5s forwards;
     }
 
     @keyframes fadeInOut {
@@ -108,13 +103,13 @@
       position: absolute;
       background-color: #000;
       z-index: 100;
-      transition: all 0.5s ease-out; /* 加快线条的过渡效果 */
+      transition: all 0.5s ease-out;
     }
 
     .circle {
       position: absolute;
-      width: 3px; /* 更小的圆 */
-      height: 3px; /* 更小的圆 */
+      width: 3px;
+      height: 3px;
       border-radius: 50%;
       background-color: #000;
     }
@@ -129,15 +124,19 @@
 
       if (isAudioPlaying) {
         audio.pause();
-        button.textContent = '🔇'; // 靜音圖示
+        button.textContent = '🔇';  // 音量关闭符号
       } else {
         audio.play();
-        button.textContent = '🎵'; // 音樂播放圖示
+        button.textContent = '🎵';  // 音乐符号
       }
       isAudioPlaying = !isAudioPlaying;
     }
 
-    // 確保音樂自動播放
+    // 修复的navigateTo函数
+    function navigateTo(url) {
+      window.location.href = url;  // 跳转到指定的 URL
+    }
+
     window.addEventListener('load', () => {
       const audio = document.querySelector('audio');
       const playAudio = () => {
@@ -148,14 +147,12 @@
         });
       };
 
-      // 嘗試自動播放音樂
       playAudio();
 
-      // 監聽點擊事件以啟用音樂（防止瀏覽器阻止）
+      // 在用户点击后启用音频
       document.body.addEventListener('click', playAudio, { once: true });
     });
 
-    // 隨機顏色生成函數
     function getRandomColor() {
       const letters = '0123456789ABCDEF';
       let color = '#';
@@ -165,13 +162,11 @@
       return color;
     }
 
-    // 隨機形狀生成函數
     function getRandomShape() {
       const shapes = ['triangle', 'polygon'];
       return shapes[Math.floor(Math.random() * shapes.length)];
     }
 
-    // 隨機生成一個多邊形
     function generatePolygon(x, y, sides, radius) {
       const angleStep = Math.PI * 2 / sides;
       const points = [];
@@ -185,39 +180,33 @@
       return points;
     }
 
-    // 粒子移動到指定位置的函數
     function moveParticle(particle, targetX, targetY) {
-      const speed = 2; // 粒子的移動速度
+      const speed = 2;
       let currentX = parseFloat(particle.style.left) || 0;
       let currentY = parseFloat(particle.style.top) || 0;
-      
-      // 計算粒子移動的方向
+
       const dx = targetX - currentX;
       const dy = targetY - currentY;
       const distance = Math.sqrt(dx * dx + dy * dy);
-      
+
       if (distance > 1) {
-        // 移動粒子
         currentX += dx / distance * speed;
         currentY += dy / distance * speed;
         particle.style.left = `${currentX}px`;
         particle.style.top = `${currentY}px`;
 
-        // 再次呼叫moveParticle以持續移動
         requestAnimationFrame(() => moveParticle(particle, targetX, targetY));
       } else {
-        // 移動到目標點後刪除粒子
         particle.remove();
       }
     }
 
-    // 在鼠標周圍生成粒子
-    let lastTime = 0; // 上次生成粒子的时间
-    const particleInterval = 100; // 生成粒子的时间间隔，降低粒子的生成频率
+    let lastTime = 0;
+    const particleInterval = 50;
 
     document.addEventListener('mousemove', (event) => {
       const currentTime = Date.now();
-      if (currentTime - lastTime < particleInterval) return; // 限制粒子的生成频率
+      if (currentTime - lastTime < particleInterval) return; 
       lastTime = currentTime;
 
       const mouseX = event.pageX;
@@ -226,17 +215,14 @@
       const particle = document.createElement('div');
       particle.classList.add('particle');
 
-      // 隨機顏色
       const color = getRandomColor();
       particle.style.backgroundColor = color;
 
-      // 隨機邊數 3 到 8 邊形
       const sides = Math.floor(Math.random() * 6) + 3;
-      const radius = 8; // 更小的半徑
+      const radius = 8;
 
-      const polygonPoints = generatePolygon(mouseX + 20, mouseY + 20, sides, radius);
+      const polygonPoints = generatePolygon(mouseX + 15, mouseY + 15, sides, radius);
 
-      // 創建圓形點
       polygonPoints.forEach(point => {
         const circle = document.createElement('div');
         circle.classList.add('circle');
@@ -246,7 +232,6 @@
         particle.appendChild(circle);
       });
 
-      // 創建線條，將圓形連接
       for (let i = 0; i < polygonPoints.length; i++) {
         const start = polygonPoints[i];
         const end = polygonPoints[(i + 1) % polygonPoints.length];
@@ -259,7 +244,7 @@
         const distance = Math.sqrt(dx * dx + dy * dy);
 
         line.style.width = `${distance}px`;
-        line.style.height = '1px'; // 線條更細
+        line.style.height = '1px';
         line.style.transformOrigin = '0 0';
         line.style.transform = `rotate(${Math.atan2(dy, dx)}rad)`;
         line.style.left = `${start.x}px`;
@@ -271,39 +256,28 @@
 
       document.body.appendChild(particle);
 
-      // 讓粒子朝鼠標方向移動
       moveParticle(particle, mouseX, mouseY);
 
-      // 移除粒子
       setTimeout(() => {
         particle.remove();
-      }, 700); // 粒子存在的時間減少，快速消失
+      }, 500); 
     });
-
-    // 处理跳转
-    function navigateTo(url) {
-      window.location.href = url;
-    }
   </script>
 </head>
 <body>
 
-<!-- 背景影片 -->
 <video class="background-video" autoplay loop muted>
   <source src="background.mp4" type="video/mp4">
   您的瀏覽器不支持 HTML5 視頻標籤。
 </video>
 
-<!-- 背景音樂 -->
 <audio autoplay loop>
   <source src="background-audio.m4a" type="audio/mp4">
   您的瀏覽器不支持 HTML5 音頻標籤。
 </audio>
 
-<!-- 音樂開關按鈕 -->
 <button class="audio-control" onclick="toggleAudio()">🎵</button>
 
-<!-- 左邊按鈕 -->
 <div class="left-buttons">
   <button onclick="navigateTo('https://mega.nz/file/oi9FwS4A#KkNE8iZGZ93b9x5vJy6uLiITwzNII8G4hStZlhe71r0')">完全解除安裝</button>
   <button onclick="navigateTo('https://mega.nz/file/YqdyFZyJ#deWApPJiqjKQ90dkYeWGFemUek-fW8p-oyFAnUeEzK0')">Mstsc</button>
@@ -314,8 +288,6 @@
   <button onclick="navigateTo('https://mega.nz/file/M3sR3Z6B#Sg__HArNSzgmislb8dPcU0s1ywU73TLytanGL2XR1z8')">ico製作</button>
   <button onclick="navigateTo('https://mega.nz/file/JvNXjbwZ#UPWFYCDyzIsl41DllnDfTsGVHvO0nTp3o_mieZPOEXA')">原神模組包</button>
 </div>
-
-<!-- 右邊按鈕 -->
 <div class="right-buttons">
   <button onclick="navigateTo('https://mega.nz/file/UvFX1KrR#ALTTpl4b11sCiNPtWtxrLzIgTqSp0MCThHULFM7zVyc')">金鑰破解</button>
   <button onclick="navigateTo('https://mega.nz/file/NmFBHSxS#6d-PclRIwttvhetQnKL0u9B_nmrCqRZQouG9J-hgHY8')">VM虛擬機</button>
