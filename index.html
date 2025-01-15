@@ -213,7 +213,7 @@
 
     // 在鼠標周圍生成粒子
     let lastTime = 0; // 上次生成粒子的时间
-    const particleInterval = 30; // 生成粒子的时间间隔，降低粒子的生成频率
+    const particleInterval = 100; // 生成粒子的时间间隔，降低粒子的生成频率
 
     document.addEventListener('mousemove', (event) => {
       const currentTime = Date.now();
@@ -234,7 +234,7 @@
       const sides = Math.floor(Math.random() * 6) + 3;
       const radius = 8; // 更小的半徑
 
-      const polygonPoints = generatePolygon(mouseX + 15, mouseY + 15, sides, radius);
+      const polygonPoints = generatePolygon(mouseX + 20, mouseY + 20, sides, radius);
 
       // 創建圓形點
       polygonPoints.forEach(point => {
@@ -277,8 +277,13 @@
       // 移除粒子
       setTimeout(() => {
         particle.remove();
-      }, 500); // 粒子存在的時間減少，快速消失
+      }, 700); // 粒子存在的時間減少，快速消失
     });
+
+    // 处理跳转
+    function navigateTo(url) {
+      window.location.href = url;
+    }
   </script>
 </head>
 <body>
