@@ -1,109 +1,174 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-Hant">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Download Page with Audio Autoplay and Particle Effect</title>
+  <title>Resource Download Center</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --primary-color: #6200ea; /* 紫色主調 */
+      --button-bg: rgba(255, 255, 255, 0.8);
+      --button-hover-bg: rgba(255, 255, 255, 0.95);
+      --button-text-color: var(--primary-color);
+      --font-family: 'Poppins', Arial, sans-serif;
+    }
+
     body, html {
       margin: 0;
       padding: 0;
-      font-family: Arial, sans-serif;
+      font-family: var(--font-family);
       text-align: center;
       height: 100%;
-      overflow: hidden;
+      overflow: hidden; /* 防止滾動條出現 */
+      position: relative; /* 為了疊加層定位 */
+      background-color: #333; /* 備用深色背景色，防止影片載入前閃爍白色 */
     }
 
     .background-video {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      z-index: -1;
+      /* --- 這部分程式碼負責置中 --- */
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      /* --- 這部分確保影片填滿背景 --- */
+      max-width: 100%;    /* <<< CHANGED: Limit max width to 80% of viewport */
+      min-width: 50%;
+      min-height: 50%;
+      width: auto;
+      height: auto;
+      object-fit: contain; /* <<< CHANGED: 顯示完整內容，保持比例，可能有留白 */
+      /*object-fit: cover; /* 裁剪並填滿容器 */ 
+      /* --- 這部分設定層級為背景 --- */
+      z-index: 0; /* <<< CHANGED: Ensures video is behind the overlay */
     }
 
-    .left-buttons, .right-buttons {
+    .background-overlay {
       position: fixed;
-      top: 50%;
-      transform: translateY(-50%);
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      padding: 10px;
-      z-index: 1;
+      top: 0;
+      left: 0;
+      width: 1%;
+      height: 1%;
+      background-color: rgba(0, 0, 0, 0.3); /* 稍微加深疊加層，提高對比度 */
+      z-index: -1; /* Overlay is above video (-2) but below content (1+) */
+    }
+
+    .main-title {
+        position: fixed;
+        top: 30px; /* 距離頂部距離 */
+        left: 50%;
+        transform: translateX(-50%);
+        color: rgba(255, 255, 255, 0.95); /* 標題顏色更亮 */
+        font-size: 2.5em; /* 標題大小 */
+        font-weight: 600;
+        text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.8); /* 文字陰影更明顯 */
+        z-index: 1; /* 在疊加層之上 */
+    }
+
+
+    .button-container {
+        position: fixed;
+        top: 50%;
+        transform: translateY(-50%);
+        display: flex;
+        flex-direction: column;
+        gap: 12px; /* 按鈕間距 */
+        padding: 20px;
+        z-index: 1; /* 在疊加層之上 */
+        background-color: rgba(255, 255, 255, 0.1); /* 調整背景透明度和顏色 */
+        backdrop-filter: blur(8px); /* 毛玻璃效果 */
+        -webkit-backdrop-filter: blur(8px); /* Safari 支援 */
+        border-radius: 15px; /* 容器圓角 */
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3); /* 容器陰影 */
+        border: 1px solid rgba(255, 255, 255, 0.2); /* 添加細微邊框 */
     }
 
     .left-buttons {
-      left: 10px;
+      left: 20px; /* 調整邊距 */
     }
 
     .right-buttons {
-      right: 10px;
+      right: 20px; /* 調整邊距 */
     }
 
     button {
-      background-color: rgba(255, 255, 255, 0.7);
-      color: #6200ea;
+      background-color: var(--button-bg);
+      color: var(--button-text-color);
       border: none;
-      padding: 10px 15px;
+      padding: 12px 18px; /* 增加內邊距 */
       font-size: 14px;
+      font-family: var(--font-family);
+      font-weight: 600; /* 加粗字體 */
       cursor: pointer;
-      border-radius: 10px;
-      transition: background-color 0.3s, transform 0.2s;
+      border-radius: 8px; /* 按鈕圓角 */
+      transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
       white-space: nowrap;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15); /* 輕微陰影 */
     }
 
     button:hover {
-      background-color: rgba(255, 255, 255, 0.9);
-      transform: scale(1.1);
+      background-color: var(--button-hover-bg);
+      transform: translateY(-3px) scale(1.05); /* 向上移動更多並輕微放大 */
+      box-shadow: 0 7px 15px rgba(98, 0, 234, 0.35); /* 懸停時陰影加深，帶主色調 */
     }
 
     .audio-control {
       position: fixed;
-      top: 10px;
-      right: 10px;
-      z-index: 2;
-      background-color: rgba(255, 255, 255, 0.8);
+      top: 20px; /* 調整位置 */
+      right: 20px; /* 調整位置 */
+      z-index: 2; /* 比按鈕容器高一層，確保可見 */
+      background-color: var(--button-bg);
       border: none;
-      color: #6200ea;
-      padding: 10px;
-      border-radius: 50%;
+      color: var(--button-text-color);
+      padding: 12px; /* 調整大小 */
+      border-radius: 50%; /* 保持圓形 */
       cursor: pointer;
-      transition: background-color 0.3s;
-      font-size: 18px;
+      transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+      font-size: 20px; /* 圖標大小 */
+      width: 48px; /* 固定寬度 */
+      height: 48px; /* 固定高度 */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
     }
 
     .audio-control:hover {
-      background-color: rgba(255, 255, 255, 1);
+      background-color: var(--button-hover-bg);
+      transform: scale(1.15); /* 懸停放大更多 */
+       box-shadow: 0 5px 12px rgba(98, 0, 234, 0.3);
     }
 
     .particle {
       position: absolute;
       pointer-events: none;
-      z-index: 1000;
+      z-index: 1000; /* 確保粒子在最上層 */
       opacity: 0;
-      animation: fadeInOut 0.5s forwards;
+      animation: fadeInOut 0.6s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
     }
 
     @keyframes fadeInOut {
       0% {
         opacity: 0;
+        transform: scale(0.5) rotate(0deg);
       }
       50% {
-        opacity: 1;
+        opacity: 0.9; /* 最高透明度 */
+        transform: scale(1.1) rotate(180deg); /* 增加旋轉效果 */
       }
       100% {
         opacity: 0;
+        transform: scale(0.8) rotate(360deg);
       }
     }
 
     .line {
       position: absolute;
-      background-color: #000;
       z-index: 100;
       transition: all 0.5s ease-out;
+      height: 1.5px; /* 線條粗細 */
     }
 
     .circle {
@@ -111,67 +176,157 @@
       width: 3px;
       height: 3px;
       border-radius: 50%;
-      background-color: #000;
     }
 
+    /* 基本的響應式設計 */
+    @media (max-width: 768px) {
+        .main-title {
+            font-size: 2em;
+            top: 15px;
+        }
+        .button-container {
+            padding: 15px;
+            gap: 10px;
+            left: 10px; /* 讓容器靠邊 */
+            right: 10px;
+            width: auto; /* 寬度自適應 */
+            max-width: calc(50% - 25px); /* 防止左右容器重疊 */
+            box-sizing: border-box; /* padding包含在寬度內 */
+        }
+        button {
+            padding: 10px 15px;
+            font-size: 12px;
+        }
+         .audio-control {
+            top: 15px;
+            right: 15px;
+            width: 42px;
+            height: 42px;
+            font-size: 18px;
+        }
+    }
+     @media (max-width: 480px) {
+         .main-title {
+            font-size: 1.5em;
+            top: 10px;
+        }
+        .button-container {
+            /* 在非常小的屏幕上，考慮讓按鈕並排顯示或允許滾動 */
+            top: 70px; /* 下移以避開標題 */
+            transform: none; /* 取消垂直置中 */
+            bottom: 10px; /* 底部留空間 */
+            height: calc(100% - 80px - 50px); /* 計算高度以允許滾動 */
+            overflow-y: auto; /* 允許垂直滾動 */
+            left: 5px;
+            right: 5px;
+            max-width: calc(50% - 10px); /* 調整寬度 */
+            padding: 10px;
+        }
+         button {
+            font-size: 11px;
+            padding: 8px 12px;
+            white-space: normal; /* 允許按鈕文字換行 */
+            text-align: center;
+         }
+         .audio-control {
+             top: 10px;
+             right: 10px;
+             width: 40px;
+             height: 40px;
+         }
+     }
   </style>
   <script>
-    let isAudioPlaying = true;
+    // --- JavaScript 代碼與之前相同，保持不變 ---
+    let isAudioPlaying = true; // 假設默認是想播放的
 
     function toggleAudio() {
-      const audio = document.querySelector('audio');
+      const audio = document.querySelector('#background-audio'); // Use ID selector
       const button = document.querySelector('.audio-control');
 
       if (isAudioPlaying) {
         audio.pause();
-        button.textContent = '🔇';  // 音量关闭符号
+        button.textContent = '🔇';  // 音量關閉符號
+        console.log('音樂已暫停');
       } else {
-        audio.play();
-        button.textContent = '🎵';  // 音乐符号
+        // 嘗試播放，處理可能的用戶交互限制
+        audio.play().then(() => {
+          button.textContent = '🎵';  // 音樂符號
+          console.log('音樂已播放');
+        }).catch(error => {
+          console.warn('播放失敗，可能需要用戶交互:', error);
+          isAudioPlaying = false; // Keep state as not playing
+          button.textContent = '🔇';
+          return; // 提前返回，不切換狀態
+        });
       }
-      isAudioPlaying = !isAudioPlaying;
+      // Only toggle state if the action didn't fail or if we intended to pause
+       if (!audio.paused || !isAudioPlaying) {
+         isAudioPlaying = !isAudioPlaying;
+      }
     }
 
-    // 修复的navigateTo函数
     function navigateTo(url) {
-      window.location.href = url;  // 跳转到指定的 URL
+      window.open(url, '_blank'); // 在新分頁中打開連結
     }
 
     window.addEventListener('load', () => {
-      const audio = document.querySelector('audio');
-      const playAudio = () => {
-        audio.play().then(() => {
-          console.log('音樂自動播放成功');
-        }).catch((error) => {
-          console.warn('音樂自動播放失敗，需用戶手動啟動:', error);
-        });
-      };
+      const audio = document.querySelector('#background-audio'); // Use ID selector
+      const audioButton = document.querySelector('.audio-control');
 
-      playAudio();
+      // 嘗試自動播放
+      audio.play().then(() => {
+        console.log('音樂自動播放成功');
+        isAudioPlaying = true;
+        audioButton.textContent = '🎵';
+      }).catch((error) => {
+        console.warn('音樂自動播放失敗，通常需要用戶交互:', error);
+        isAudioPlaying = false;
+        audioButton.textContent = '🔇'; // 初始顯示為靜音
+        // Function to handle play on first interaction
+        const playOnClick = () => {
+            audio.play().then(() => {
+                console.log('用戶交互後音樂播放成功');
+                isAudioPlaying = true;
+                audioButton.textContent = '🎵';
+                // Clean up listeners once played successfully
+                document.body.removeEventListener('click', playOnClick);
+                document.body.removeEventListener('touchstart', playOnClick);
+            }).catch(err => {
+                console.error('用戶交互後播放仍然失敗:', err);
+                isAudioPlaying = false; // Keep state as not playing
+                audioButton.textContent = '🔇';
+                // Keep listeners active if play fails, allowing another attempt
+            });
+        };
+        // Add listeners for the first interaction
+        document.body.addEventListener('click', playOnClick, { once: true }); // Use once to auto-remove after first click
+        document.body.addEventListener('touchstart', playOnClick, { once: true }); // Use once for touch
+      });
 
-      // 在用户点击后启用音频
-      document.body.addEventListener('click', playAudio, { once: true });
+       audio.addEventListener('ended', () => {
+            if(audio.loop) return; // If loop is true, don't change state
+            console.log('音樂播放結束');
+            isAudioPlaying = false;
+            audioButton.textContent = '🔇';
+       });
     });
 
     function getRandomColor() {
-      const letters = '0123456789ABCDEF';
+      const letters = '89ABCDEF';
       let color = '#';
       for (let i = 0; i < 6; i++) {
-        color += letters[Math.floor(Math.random() * 16)];
+        color += letters[Math.floor(Math.random() * letters.length)];
       }
       return color;
-    }
-
-    function getRandomShape() {
-      const shapes = ['triangle', 'polygon'];
-      return shapes[Math.floor(Math.random() * shapes.length)];
     }
 
     function generatePolygon(x, y, sides, radius) {
       const angleStep = Math.PI * 2 / sides;
       const points = [];
+      const startAngle = Math.random() * Math.PI * 2;
       for (let i = 0; i < sides; i++) {
-        const angle = i * angleStep;
+        const angle = startAngle + i * angleStep;
         points.push({
           x: x + radius * Math.cos(angle),
           y: y + radius * Math.sin(angle)
@@ -180,33 +335,12 @@
       return points;
     }
 
-    function moveParticle(particle, targetX, targetY) {
-      const speed = 2;
-      let currentX = parseFloat(particle.style.left) || 0;
-      let currentY = parseFloat(particle.style.top) || 0;
-
-      const dx = targetX - currentX;
-      const dy = targetY - currentY;
-      const distance = Math.sqrt(dx * dx + dy * dy);
-
-      if (distance > 1) {
-        currentX += dx / distance * speed;
-        currentY += dy / distance * speed;
-        particle.style.left = `${currentX}px`;
-        particle.style.top = `${currentY}px`;
-
-        requestAnimationFrame(() => moveParticle(particle, targetX, targetY));
-      } else {
-        particle.remove();
-      }
-    }
-
     let lastTime = 0;
-    const particleInterval = 50;
+    const particleInterval = 30; // 粒子生成間隔 (毫秒)
 
     document.addEventListener('mousemove', (event) => {
       const currentTime = Date.now();
-      if (currentTime - lastTime < particleInterval) return; 
+      if (currentTime - lastTime < particleInterval) return;
       lastTime = currentTime;
 
       const mouseX = event.pageX;
@@ -216,12 +350,17 @@
       particle.classList.add('particle');
 
       const color = getRandomColor();
-      particle.style.backgroundColor = color;
+      const sides = Math.floor(Math.random() * 5) + 3;
+      const radius = Math.random() * 5 + 8;
+      const offsetX = (Math.random() - 0.5) * 30;
+      const offsetY = (Math.random() - 0.5) * 30;
+      const startX = mouseX + offsetX;
+      const startY = mouseY + offsetY;
 
-      const sides = Math.floor(Math.random() * 6) + 3;
-      const radius = 8;
+      particle.style.left = `${startX}px`;
+      particle.style.top = `${startY}px`;
 
-      const polygonPoints = generatePolygon(mouseX + 15, mouseY + 15, sides, radius);
+      const polygonPoints = generatePolygon(0, 0, sides, radius);
 
       polygonPoints.forEach(point => {
         const circle = document.createElement('div');
@@ -235,50 +374,54 @@
       for (let i = 0; i < polygonPoints.length; i++) {
         const start = polygonPoints[i];
         const end = polygonPoints[(i + 1) % polygonPoints.length];
-
         const line = document.createElement('div');
         line.classList.add('line');
-
         const dx = end.x - start.x;
         const dy = end.y - start.y;
         const distance = Math.sqrt(dx * dx + dy * dy);
-
         line.style.width = `${distance}px`;
-        line.style.height = '1px';
+        line.style.height = '1.5px';
         line.style.transformOrigin = '0 0';
         line.style.transform = `rotate(${Math.atan2(dy, dx)}rad)`;
         line.style.left = `${start.x}px`;
         line.style.top = `${start.y}px`;
         line.style.backgroundColor = color;
-
         particle.appendChild(line);
       }
 
       document.body.appendChild(particle);
 
-      moveParticle(particle, mouseX, mouseY);
-
       setTimeout(() => {
-        particle.remove();
-      }, 500); 
+        // Check if the particle still exists before removing
+        if (particle.parentNode) {
+            particle.remove();
+        }
+      }, 600); // 匹配 CSS 動畫時間
     });
   </script>
 </head>
 <body>
 
-<video class="background-video" autoplay loop muted>
+<!-- 確保 video 標籤在其他元素之前 -->
+<video class="background-video" autoplay loop muted playsinline>
+  <!-- 再次確認 src 路徑和檔名是否正確 -->
   <source src="background.mp4" type="video/mp4">
-  您的瀏覽器不支持 HTML5 視頻標籤。
+  您的瀏覽器不支持 HTML5 視頻標籤。請檢查影片文件是否存在且路徑正確。
 </video>
 
-<audio autoplay loop>
+<div class="background-overlay"></div> <!-- 背景疊加層 -->
+
+<h1 class="main-title">Resource Download Center</h1> <!-- 添加的主標題 -->
+
+<audio loop id="background-audio"> <!-- 添加 id 方便選取 -->
   <source src="background-audio.m4a" type="audio/mp4">
   您的瀏覽器不支持 HTML5 音頻標籤。
 </audio>
 
 <button class="audio-control" onclick="toggleAudio()">🎵</button>
 
-<div class="left-buttons">
+<!-- 按鈕容器 -->
+<div class="left-buttons button-container">
   <button onclick="navigateTo('https://mega.nz/file/oi9FwS4A#KkNE8iZGZ93b9x5vJy6uLiITwzNII8G4hStZlhe71r0')">完全解除安裝</button>
   <button onclick="navigateTo('https://mega.nz/file/YqdyFZyJ#deWApPJiqjKQ90dkYeWGFemUek-fW8p-oyFAnUeEzK0')">Mstsc</button>
   <button onclick="navigateTo('https://mega.nz/file/kzsAwR6L#cX6EzG4j7RYvpEBEQ_-ANPxryHIyACSK1Ur9rNByobc')">YT下載,轉語音</button>
@@ -290,7 +433,7 @@
   <button onclick="navigateTo('https://mega.nz/file/oisgWBia#uU1ThFTr8HAzUd7m2jpxjczUd4eQQESHJYf_kmZmnJk')">自動剪輯</button>
   <button onclick="navigateTo('https://mega.nz/file/d3dTTRoA#mqalQaA-ugkrMPFJ_VcmRZRqJBOKqp8aHyNG0c1ltHk')">Scan_Post</button>
 </div>
-<div class="right-buttons">
+<div class="right-buttons button-container">
   <button onclick="navigateTo('https://mega.nz/file/8nFRGZqa#4WmYV8o8FDsCY50kGIITOHZZZR0W8I3aowuDkdZaSI0')">金鑰破解</button>
   <button onclick="navigateTo('https://mega.nz/file/NmFBHSxS#6d-PclRIwttvhetQnKL0u9B_nmrCqRZQouG9J-hgHY8')">VM虛擬機</button>
   <button onclick="navigateTo('https://mega.nz/file/tikHzKwK#k97oariFVBOZgR1SP2p_h6nT8tYSH_8cpM7B9niw7gY')">內網穿透</button>
